@@ -1,0 +1,13 @@
+name = "KentFinancialEconomics"
+uuid = "d25922fc-bd96-40f7-b40f-06488b0011f7"
+authors = ["alfredjmduncan <alfie.j.duncan@gmail.com> and contributors"]
+version = "0.1.0"
+
+[compat]
+julia = "1"
+
+[extras]
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["Test"]
