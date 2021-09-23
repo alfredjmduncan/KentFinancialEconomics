@@ -3,6 +3,15 @@ uuid = "d25922fc-bd96-40f7-b40f-06488b0011f7"
 authors = ["alfredjmduncan <alfie.j.duncan@gmail.com> and contributors"]
 version = "0.1.0"
 
+[deps]
+CSV = "336ed68f-0bac-5ca0-87d4-7b16caf5d00b"
+DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
+HTTP = "cd3eb016-35fb-5094-929b-558a96fad6f3"
+InfoZIP = "f4508453-b816-52ab-a864-26fc7f6211fc"
+JSON = "682c06a0-de6a-54ab-a142-c8b1cf79cde6"
+Revise = "295af30f-e4ad-537b-8983-00126c2a3abe"
+TimeSeries = "9e3dc215-6440-5c97-bce1-76c03772f85e"
+
 [compat]
 julia = "1"
 
