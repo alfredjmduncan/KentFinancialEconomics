@@ -5,6 +5,14 @@
 [![Build Status](https://travis-ci.com/alfredjmduncan/KentFinancialEconomics.jl.svg?branch=master)](https://travis-ci.com/alfredjmduncan/KentFinancialEconomics.jl)
 [![Coverage](https://codecov.io/gh/alfredjmduncan/KentFinancialEconomics.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/alfredjmduncan/KentFinancialEconomics.jl) -->
 
+## Installing the package
+
+```julia
+using Pkg
+Pkg.add("https://github.com/alfredjmduncan/KentFinancialEconomics")
+
+```
+
 
 ## Example usage
 
