@@ -1,4 +1,20 @@
 
+# Helper function
+
+function zip_url_to_df(url)
+    # ZipFile as dependency
+    zip_response = HTTP.get(url)
+    zipb = zip_response.body
+    ziparchive = ZipFile.Reader(IOBuffer(zipb, read=true, write=true))
+    return df = CSV.File(ziparchive.files[1]) |> DataFrame
+end
+
+# InfoZip as dependency
+# zip_response = HTTP.get(url)
+# zip_data = InfoZIP.open_zip(zip_response.body)
+# s = zip_data[zip_data.keys[1]];
+# return df = CSV.File(IOBuffer(s)) |> DataFrame
+
 """
     fundamentals(api_key)
 
@@ -50,10 +66,7 @@ function fundamentals(api_key)
         df_  = CSV.File(HTTP.get(url*api_key).body) |> DataFrame
         url_ = df_[!,Symbol("file.link")][1]
         println("Downloading the dataset")
-        zip_response = HTTP.get(url_)
-        zip_data = InfoZIP.open_zip(zip_response.body)
-        s = zip_data[zip_data.keys[1]];
-        df = CSV.File(IOBuffer(s)) |> DataFrame
+        df = zip_url_to_df(url_)
         return df
     catch
         println("I couldn't download the dataset. This could be due to one of the ")
@@ -125,10 +138,7 @@ function events(api_key)
         df_  = CSV.File(HTTP.get(url*api_key).body) |> DataFrame
         url_ = df_[!,Symbol("file.link")][1]
         println("Downloading the dataset")
-        zip_response = HTTP.get(url_)
-        zip_data = InfoZIP.open_zip(zip_response.body)
-        s = zip_data[zip_data.keys[1]];
-        df = CSV.File(IOBuffer(s)) |> DataFrame
+        df = zip_url_to_df(url_)
         df[!, :eventcodes] = split.(df[:,:eventcodes], '|');
         df = flatten(df, :eventcodes)
         return df
@@ -218,10 +228,7 @@ function metadata(api_key)
         df_  = CSV.File(HTTP.get(url*api_key).body) |> DataFrame
         url_ = df_[!,Symbol("file.link")][1]
         println("Downloading the dataset")
-        zip_response = HTTP.get(url_)
-        zip_data = InfoZIP.open_zip(zip_response.body)
-        s = zip_data[zip_data.keys[1]];
-        df = CSV.File(IOBuffer(s)) |> DataFrame
+        df = zip_url_to_df(url_)
         return df
     catch
         println("I couldn't download the dataset. This could be due to one of the ")
@@ -264,9 +271,18 @@ julia> stockprices(api_key)
 ```
 """
 
-function stockprices(api_key)
+function stockprices(
+    api_key::String;ticker="",
+    start_date=Dates.today() - Dates.Year(1)
+    )
 
-    url  = "https://www.quandl.com/api/v3/datatables/SHARADAR/SEP.csv?&qopts.export=true&api_key="
+    url = "https://www.quandl.com/api/v3/datatables/SHARADAR/SEP.csv?&qopts.export=true"*
+            (ticker == "" ? "" : "&ticker="*ticker)*
+            "&date.gte="*Dates.format(start_date,"yyyy-mm-dd")*
+            "&api_key="*
+            api_key
+
+    println("api call = "*url)
     println("Downloading the following data:")
     println("Dataset: Sharadar CORE US Equities Bundle")
     println("Table:   Equity Prices")
@@ -275,13 +291,11 @@ function stockprices(api_key)
     println("This will take a few minutes.")
     try
         println("Generating download link")
-        df_  = CSV.File(HTTP.get(url*api_key).body) |> DataFrame
+        df_  = CSV.File(HTTP.get(url).body) |> DataFrame
         url_ = df_[!,Symbol("file.link")][1]
         println("Downloading the dataset")
-        zip_response = HTTP.get(url_)
-        zip_data = InfoZIP.open_zip(zip_response.body)
-        s = zip_data[zip_data.keys[1]];
-        df = CSV.File(IOBuffer(s)) |> DataFrame
+        df = zip_url_to_df(url_)
+        sort!(df,[:ticker,:date])
         return df
     catch
         println("I couldn't download the dataset. This could be due to one of the ")
@@ -302,9 +316,80 @@ function stockprices(api_key)
 end
 
 
+
 function stockprices()
     println("Please provide your Quandl API key as an argument to the function:")
     println("      stockprices(\"api_key_goes_here\")")
+    println("Your API key will look something like -31swyRz8v4SoNL_zyYc ")
+    println("Make sure that you include the double quote marks as above.")
+end
+
+
+
+"""
+    fundprices(api_key)
+
+Download the Equity Prices dataset from Sharadar via Quandl.
+
+
+# Examples
+```julia-repl
+julia> api_key = "-31swyRz8v4SoNL_zyYc"
+julia> fundprices(api_key)
+
+```
+"""
+
+function fundprices(
+    api_key::String;
+    ticker="",
+    start_date=Dates.today() - Dates.Year(1)
+    )
+
+    url = "https://www.quandl.com/api/v3/datatables/SHARADAR/SFP.csv?&qopts.export=true"*
+            (ticker == "" ? "" : "&ticker="*ticker)*
+            "&date.gte="*Dates.format(start_date,"yyyy-mm-dd")*
+            "&api_key="*
+            api_key
+
+    println("api call = "*url)
+    println("Downloading the following data:")
+    println("Dataset: Sharadar CORE US Equities Bundle")
+    println("Table:   Equity Prices")
+    println("Source:  Quandl")
+    println("URL:     https://data.nasdaq.com/tables/SFA/SHARADAR-SFP")
+    println("This will take a few minutes.")
+    try
+        println("Generating download link")
+        df_  = CSV.File(HTTP.get(url).body) |> DataFrame
+        url_ = df_[!,Symbol("file.link")][1]
+        println("Downloading the dataset")
+        df = zip_url_to_df(url_)
+        sort!(df,[:ticker,:date])
+        return df
+    catch
+        println("I couldn't download the dataset. This could be due to one of the ")
+        println("following issues:")
+        println("")
+        println(" 1. Make sure that you provide your API key, with double quote")
+        println("    marks as follows:")
+        println("          fundprices(\"api_key_goes_here\")")
+        println("    Your API key will look something like -31swyRz8v4SoNL_zyYc ")
+        println("    If you haven't received an API key for Quandl, inform your ")
+        println("    instructor.")
+        println(" 2. Make sure that you're connected to the internet.")
+        println(" 3. Make sure that you can login to Quandl.com. ")
+        println("    Check by going to the following URL:")
+        println("    https://www.quandl.com/databases/SFA/data")
+        println("    and check that you can open the datasets in your browser.")
+    end
+end
+
+
+
+function fundprices()
+    println("Please provide your Quandl API key as an argument to the function:")
+    println("      fundprices(\"api_key_goes_here\")")
     println("Your API key will look something like -31swyRz8v4SoNL_zyYc ")
     println("Make sure that you include the double quote marks as above.")
 end
