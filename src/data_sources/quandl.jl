@@ -2,18 +2,12 @@
 # Helper function
 
 function zip_url_to_df(url)
-    # ZipFile as dependency
     zip_response = HTTP.get(url)
     zipb = zip_response.body
     ziparchive = ZipFile.Reader(IOBuffer(zipb, read=true, write=true))
     return df = CSV.File(ziparchive.files[1]) |> DataFrame
 end
 
-# InfoZip as dependency
-# zip_response = HTTP.get(url)
-# zip_data = InfoZIP.open_zip(zip_response.body)
-# s = zip_data[zip_data.keys[1]];
-# return df = CSV.File(IOBuffer(s)) |> DataFrame
 
 """
     fundamentals(api_key)
