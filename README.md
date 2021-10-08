@@ -9,7 +9,7 @@
 
 ```julia
 using Pkg
-Pkg.add("https://github.com/alfredjmduncan/KentFinancialEconomics")
+Pkg.add(url = "https://github.com/alfredjmduncan/KentFinancialEconomics")
 
 ```
 
